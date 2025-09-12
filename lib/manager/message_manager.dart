@@ -126,11 +126,11 @@ class MessageManagerState extends State<MessageManager> {
                                       ),
                                     ),
                                     SizedBox(width: 16),
-                                    TextButton(
+                                    IconButton(
                                       onPressed: () {
                                         _cancelMessage(messages.last.id);
                                       },
-                                      child: Text(appLocalizations.cancel),
+                                      icon: Icon(Icons.close),
                                     ),
                                   ],
                                 ),

@@ -18,11 +18,14 @@ class CoreLib extends CoreHandlerInterface {
   @override
   Future<String> preload() async {
     final res = await service?.init();
-    await service?.syncAndroidState(globalState.getAndroidState());
-    if (res?.isEmpty == true) {
-      _connectedCompleter.complete(true);
+    if (res?.isEmpty != true) {
+      return res ?? '';
     }
-    return res ?? '';
+    _connectedCompleter.complete(true);
+    final syncRes = await service?.syncAndroidState(
+      globalState.getAndroidState(),
+    );
+    return syncRes ?? '';
   }
 
   factory CoreLib() {

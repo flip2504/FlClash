@@ -149,7 +149,7 @@ fun Context.receiveBroadcastFlow(
 inline fun <reified T : IBinder> Context.bindServiceFlow(
     intent: Intent,
     flags: Int = Context.BIND_AUTO_CREATE,
-    maxRetries: Int = 5,
+    maxRetries: Int = 10,
     retryDelayMillis: Long = 200L
 ): Flow<Pair<IBinder?, String>> = callbackFlow {
     val connection = object : ServiceConnection {

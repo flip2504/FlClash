@@ -32,9 +32,8 @@ suspend fun PackageManager.getPackageIconPath(packageName: String): String =
             if (iconFile.exists() && !isExpired(iconFile)) {
                 return@withContext iconFile.absolutePath
             }
-            iconDir.listFiles()?.forEach { file ->
-                if (file.name.startsWith(packageName + "_")) file.delete()
-            }
+            iconDir.listFiles { f -> f.name.startsWith("${packageName}_") }?.forEach(File::delete)
+
             val icon = getApplicationIcon(packageName)
             saveDrawableToFile(icon, iconFile)
             iconFile.absolutePath
@@ -47,8 +46,10 @@ suspend fun PackageManager.getPackageIconPath(packageName: String): String =
         }
     }
 
-private fun saveDrawableToFile(drawable: Drawable, file: File) {
-    val bitmap = drawable.toBitmap()
+private suspend fun saveDrawableToFile(drawable: Drawable, file: File) {
+    val bitmap = withContext(Dispatchers.Default) {
+        drawable.toBitmap(width = 128, height = 128)
+    }
     try {
         val format = when {
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> {

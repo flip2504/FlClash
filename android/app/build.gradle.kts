@@ -5,8 +5,18 @@ plugins {
     id("com.android.application")
     id("kotlin-android")
     id("dev.flutter.flutter-gradle-plugin")
-    id("com.google.gms.google-services")
-    id("com.google.firebase.crashlytics")
+    id("com.google.gms.google-services") apply false
+    id("com.google.firebase.crashlytics") apply false
+}
+
+val hasGoogleServicesJson =
+    file("google-services.json").let { it.exists() && it.length() > 0 }
+
+if (hasGoogleServicesJson) {
+    apply(plugin = "com.google.gms.google-services")
+    apply(plugin = "com.google.firebase.crashlytics")
+} else {
+    println("google-services.json not found; skipping Firebase plugins")
 }
 
 val localPropertiesFile = rootProject.file("local.properties")

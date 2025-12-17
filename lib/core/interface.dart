@@ -155,9 +155,11 @@ abstract class CoreHandlerInterface with CoreInterface {
 
   @override
   Future<String> updateConfig(UpdateParams updateParams) async {
+    final data = updateParams.toJson();
+    data['external-controller'] = updateParams.externalController.configValue;
     return await _invoke<String>(
           method: ActionMethod.updateConfig,
-          data: json.encode(updateParams),
+          data: json.encode(data),
         ) ??
         '';
   }

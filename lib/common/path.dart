@@ -13,19 +13,39 @@ class AppPath {
   Completer<Directory> cacheDir = Completer();
   late String appDirPath;
 
+  static const _defaultBrandId = 'flclash';
+
+  String get _safeBrandPathSegment {
+    final safe = brandId.replaceAll(RegExp(r'[^A-Za-z0-9._-]+'), '_');
+    return safe.isEmpty ? _defaultBrandId : safe;
+  }
+
+  Directory _brandScopedDir(Directory base) {
+    if (brandId == _defaultBrandId) {
+      return base;
+    }
+    return Directory(join(base.path, 'brands', _safeBrandPathSegment));
+  }
+
   AppPath._internal() {
     appDirPath = join(dirname(Platform.resolvedExecutable));
-    getApplicationSupportDirectory().then((value) {
-      dataDir.complete(value);
+    getApplicationSupportDirectory().then((value) async {
+      final scoped = _brandScopedDir(value);
+      await scoped.create(recursive: true);
+      dataDir.complete(scoped);
     });
-    getTemporaryDirectory().then((value) {
-      tempDir.complete(value);
+    getTemporaryDirectory().then((value) async {
+      final scoped = _brandScopedDir(value);
+      await scoped.create(recursive: true);
+      tempDir.complete(scoped);
     });
     getDownloadsDirectory().then((value) {
       downloadDir.complete(value);
     });
-    getApplicationCacheDirectory().then((value) {
-      cacheDir.complete(value);
+    getApplicationCacheDirectory().then((value) async {
+      final scoped = _brandScopedDir(value);
+      await scoped.create(recursive: true);
+      cacheDir.complete(scoped);
     });
   }
 
@@ -44,7 +64,13 @@ class AppPath {
   }
 
   String get corePath {
-    return join(executableDirPath, 'FlClashCore$executableExtension');
+    final coreBaseName = system.isWindows
+        ? const String.fromEnvironment(
+            'CORE_EXECUTABLE_NAME_WINDOWS',
+            defaultValue: 'FlClashCore',
+          )
+        : 'FlClashCore';
+    return join(executableDirPath, '$coreBaseName$executableExtension');
   }
 
   String get helperPath {
@@ -63,7 +89,10 @@ class AppPath {
 
   Future<String> get lockFilePath async {
     final homeDirPath = await appPath.homeDirPath;
-    return join(homeDirPath, 'FlClash.lock');
+    if (brandId == _defaultBrandId) {
+      return join(homeDirPath, 'FlClash.lock');
+    }
+    return join(homeDirPath, 'FlClash_$_safeBrandPathSegment.lock');
   }
 
   Future<String> get configFilePath async {

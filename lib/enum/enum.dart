@@ -167,6 +167,14 @@ enum ExternalControllerStatus {
   final String value;
 
   const ExternalControllerStatus(this.value);
+
+  String get configValue {
+    return switch (this) {
+      ExternalControllerStatus.close => '',
+      ExternalControllerStatus.open =>
+        "127.0.0.1:${int.fromEnvironment('EXTERNAL_CONTROLLER_PORT', defaultValue: 9090)}",
+    };
+  }
 }
 
 enum KeyboardModifier {

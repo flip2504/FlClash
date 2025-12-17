@@ -9,14 +9,41 @@ import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/models/models.dart';
 import 'package:flutter/material.dart';
 
-const appName = 'FlClash';
-const appHelperService = 'FlClashHelperService';
+const brandId = String.fromEnvironment('BRAND_ID', defaultValue: 'flclash');
+const appName = String.fromEnvironment('APP_NAME', defaultValue: 'FlClash');
+const appHelperService = String.fromEnvironment(
+  'APP_HELPER_SERVICE',
+  defaultValue: 'FlClashHelperService',
+);
 const coreName = 'clash.meta';
 const browserUa =
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
 const packageName = 'com.follow.clash';
-final unixSocketPath = '/tmp/FlClashSocket_${Random().nextInt(10000)}.sock';
-const helperPort = 47890;
+
+String _buildUnixSocketPath() {
+  final safeBrand = brandId.replaceAll(RegExp(r'[^A-Za-z0-9_-]+'), '_');
+  final randHex = Random().nextInt(0x7fffffff).toRadixString(16);
+
+  // Keep it short to avoid hitting unix domain socket path limits (~100 bytes).
+  const prefix = '/tmp/flclash_';
+  final suffix = '_$randHex.sock';
+  const maxTotal = 100;
+
+  final maxBrandLen = maxTotal - prefix.length - suffix.length;
+  final brandPart = maxBrandLen > 0
+      ? (safeBrand.length > maxBrandLen
+            ? safeBrand.substring(0, maxBrandLen)
+            : safeBrand)
+      : '';
+  final effectiveBrandPart = brandPart.isEmpty ? 'socket' : brandPart;
+
+  return '$prefix$effectiveBrandPart$suffix';
+}
+
+final unixSocketPath = _buildUnixSocketPath();
+const helperPort = int.fromEnvironment('HELPER_PORT', defaultValue: 47890);
+const dnsListenPort = int.fromEnvironment('DNS_LISTEN_PORT', defaultValue: 1053);
+const defaultDnsListen = '0.0.0.0:$dnsListenPort';
 const maxTextScale = 1.4;
 const minTextScale = 0.8;
 final baseInfoEdgeInsets = EdgeInsets.symmetric(
@@ -52,7 +79,21 @@ const localhost = '127.0.0.1';
 const clashConfigKey = 'clash_config';
 const configKey = 'config';
 const double dialogCommonWidth = 300;
-const repository = 'chen08209/FlClash';
+const repository = String.fromEnvironment(
+  'REPOSITORY',
+  defaultValue: 'chen08209/FlClash',
+);
+
+const protocolSchemesCsv = String.fromEnvironment(
+  'PROTOCOL_SCHEMES',
+  defaultValue: 'clash,clashmeta,flclash',
+);
+
+List<String> get protocolSchemes => protocolSchemesCsv
+    .split(',')
+    .map((e) => e.trim())
+    .where((e) => e.isNotEmpty)
+    .toList(growable: false);
 const defaultExternalController = '127.0.0.1:9090';
 const maxMobileWidth = 600;
 const maxLaptopWidth = 840;

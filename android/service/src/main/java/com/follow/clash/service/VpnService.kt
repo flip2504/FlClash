@@ -53,6 +53,10 @@ class VpnService : SystemVpnService(), IBaseService,
     }
     private val uidPageNameMap = mutableMapOf<Int, String>()
 
+    private fun appLabel(): String {
+        return applicationInfo.loadLabel(packageManager).toString()
+    }
+
     private fun resolverProcess(
         protocol: Int,
         source: InetSocketAddress,
@@ -204,7 +208,7 @@ class VpnService : SystemVpnService(), IBaseService,
                     }
                 }
             }
-            setSession("FlClash")
+            setSession(appLabel())
             setBlocking(false)
             if (Build.VERSION.SDK_INT >= 29) {
                 setMetered(false)

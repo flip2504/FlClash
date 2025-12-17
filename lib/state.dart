@@ -440,7 +440,7 @@ class GlobalState {
 
     final res = await Isolate.run<Map<String, dynamic>>(() async {
       rawConfig['external-controller'] =
-          realPatchConfig.externalController.value;
+          realPatchConfig.externalController.configValue;
       rawConfig['external-ui'] = '';
       rawConfig['interface-name'] = '';
       rawConfig['external-ui-url'] = '';
@@ -545,6 +545,14 @@ class GlobalState {
         if (!nameserver.contains(systemDns)) {
           rawConfig['dns']['nameserver'] = [...nameserver, systemDns];
         }
+      }
+      if (rawConfig['dns'] is Map) {
+        final dnsListenRaw = realPatchConfig.dns.listen.trim();
+        final listen =
+            (dnsListenRaw.isEmpty || dnsListenRaw == '0.0.0.0:1053')
+                ? defaultDnsListen
+                : dnsListenRaw;
+        (rawConfig['dns'] as Map)['listen'] = listen;
       }
       List<String> rules = [];
       if (rawConfig['rules'] != null) {

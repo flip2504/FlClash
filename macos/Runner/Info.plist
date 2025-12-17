@@ -27,9 +27,11 @@
 			<string></string>
 			<key>CFBundleURLSchemes</key>
 			<array>
+				<!-- BRAND:URL_SCHEMES_BEGIN -->
 				<string>clash</string>
 				<string>clashmeta</string>
 				<string>flclash</string>
+				<!-- BRAND:URL_SCHEMES_END -->
 			</array>
 		</dict>
 	</array>

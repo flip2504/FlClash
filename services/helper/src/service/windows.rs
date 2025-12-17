@@ -16,7 +16,9 @@ use windows_service::{
     service_dispatcher, Result,
 };
 
-const SERVICE_NAME: &str = "FlClashHelperService";
+fn service_name() -> &'static str {
+    option_env!("SERVICE_NAME").unwrap_or("FlClashHelperService")
+}
 
 const SERVICE_TYPE: ServiceType = ServiceType::OWN_PROCESS;
 
@@ -25,7 +27,7 @@ pub fn main() -> Result<()> {
 }
 
 pub fn start_service() -> Result<()> {
-    service_dispatcher::start(SERVICE_NAME, serveice)
+    service_dispatcher::start(service_name(), serveice)
 }
 
 define_windows_service!(serveice, service_main);
@@ -39,7 +41,7 @@ pub fn service_main(_arguments: Vec<OsString>) {
 }
 async fn run_windows_service() -> anyhow::Result<()> {
     let status_handle = service_control_handler::register(
-        SERVICE_NAME,
+        service_name(),
         move |event| -> ServiceControlHandlerResult {
             match event {
                 ServiceControl::Interrogate => ServiceControlHandlerResult::NoError,
@@ -61,7 +63,6 @@ async fn run_windows_service() -> anyhow::Result<()> {
 
     run_service().await
 }
-
 
 
 

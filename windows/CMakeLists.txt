@@ -5,6 +5,9 @@ project(FlClash LANGUAGES CXX)
 # The name of the executable created for the application. Change this to change
 # the on-disk name of your application.
 set(BINARY_NAME "FlClash")
+if(DEFINED ENV{FLCLASH_BINARY_NAME})
+  set(BINARY_NAME "$ENV{FLCLASH_BINARY_NAME}")
+endif()
 
 # Explicitly opt in to modern CMake behaviors to avoid warnings with recent
 # versions of CMake.
@@ -84,16 +87,27 @@ install(FILES "${FLUTTER_LIBRARY}" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
 # libclash.so
 set(CLASH_DIR "../libclash/windows")
 
+# Allow white-label builds to override bundled binary names.
+set(FLCLASH_CORE_EXE "FlClashCore.exe")
+if(DEFINED ENV{FLCLASH_CORE_EXE})
+  set(FLCLASH_CORE_EXE "$ENV{FLCLASH_CORE_EXE}")
+endif()
+
+set(FLCLASH_HELPER_EXE "FlClashHelperService.exe")
+if(DEFINED ENV{FLCLASH_HELPER_EXE})
+  set(FLCLASH_HELPER_EXE "$ENV{FLCLASH_HELPER_EXE}")
+endif()
+
 # if(CMAKE_SYSTEM_PROCESSOR STREQUAL "ARM64" OR CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
 # elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "ARM" OR CMAKE_SYSTEM_PROCESSOR MATCHES "armv[0-9]+")
 # elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "x86")
 #   set(CLASH_DIR "../libclash/windows/x86")
 # endif()
 
-install(PROGRAMS "${CLASH_DIR}/FlClashCore.exe" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
+install(PROGRAMS "${CLASH_DIR}/${FLCLASH_CORE_EXE}" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
   COMPONENT Runtime)
 
-install(PROGRAMS "${CLASH_DIR}/FlClashHelperService.exe" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
+install(PROGRAMS "${CLASH_DIR}/${FLCLASH_HELPER_EXE}" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
   COMPONENT Runtime)
 
 install(FILES "EnableLoopback.exe" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"

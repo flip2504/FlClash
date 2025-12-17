@@ -9,7 +9,11 @@ use std::sync::{Arc, Mutex};
 use std::{io, thread};
 use warp::{Filter, Reply};
 
-const LISTEN_PORT: u16 = 47890;
+fn listen_port() -> u16 {
+    option_env!("HELPER_PORT")
+        .and_then(|value| value.parse::<u16>().ok())
+        .unwrap_or(47890)
+}
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct StartParams {
@@ -118,7 +122,7 @@ pub async fn run_service() -> anyhow::Result<()> {
     let api_logs = warp::get().and(warp::path("logs")).map(|| get_logs());
 
     warp::serve(api_ping.or(api_start).or(api_stop).or(api_logs))
-        .run(([127, 0, 0, 1], LISTEN_PORT))
+        .run(([127, 0, 0, 1], listen_port()))
         .await;
 
     Ok(())

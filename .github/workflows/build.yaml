@@ -48,6 +48,17 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Resolve Brand
+        shell: bash
+        run: |
+          tag="${GITHUB_REF_NAME}"
+          if [[ "$tag" == *"+"* ]]; then
+            brand="${tag#*+}"
+          else
+            brand="flclash"
+          fi
+          echo "BRAND_ID=$brand" >> "$GITHUB_ENV"
+
       - name: Setup Android Signing (optional)
         if: startsWith(matrix.platform,'android')
         shell: bash
@@ -103,8 +114,13 @@ jobs:
           flutter --version
           flutter pub get
 
+      - name: Generate Brand Assets
+        shell: bash
+        run: |
+          dart run tool/generate_brand_assets.dart --brand "${BRAND_ID}"
+
       - name: Setup
-        run: dart setup.dart ${{ matrix.platform }} ${{ matrix.arch && format('--arch {0}', matrix.arch) }} ${{ env.IS_STABLE == 'true' && '--env stable' || '' }}
+        run: dart setup.dart ${{ matrix.platform }} --brand ${{ env.BRAND_ID }} ${{ matrix.arch && format('--arch {0}', matrix.arch) }} ${{ env.IS_STABLE == 'true' && '--env stable' || '' }}
 
       - name: Upload
         uses: actions/upload-artifact@v4

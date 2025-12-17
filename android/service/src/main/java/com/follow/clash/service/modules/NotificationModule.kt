@@ -46,6 +46,10 @@ val NotificationParams.extended: ExtendedNotificationParams
 class NotificationModule(private val service: Service) : Module() {
     private val scope = CoroutineScope(Dispatchers.Default)
 
+    private fun appLabel(): String {
+        return service.applicationInfo.loadLabel(service.packageManager).toString()
+    }
+
     override fun onInstall() {
         scope.launch {
             val screenFlow = service.receiveBroadcastFlow {
@@ -91,7 +95,7 @@ class NotificationModule(private val service: Service) : Module() {
             )
         ) {
             setSmallIcon(R.drawable.ic)
-            setContentTitle("FlClash")
+            setContentTitle(appLabel())
             setContentIntent(intent.toPendingIntent)
             setPriority(NotificationCompat.PRIORITY_HIGH)
             setCategory(NotificationCompat.CATEGORY_SERVICE)
@@ -107,7 +111,7 @@ class NotificationModule(private val service: Service) : Module() {
     private fun update(params: ExtendedNotificationParams) {
         service.startForeground(
             with(notificationBuilder) {
-                setContentTitle(params.title)
+                setContentTitle(params.title.ifBlank { appLabel() })
                 setContentText(params.contentText)
                 clearActions()
                 addAction(

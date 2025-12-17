@@ -2,6 +2,7 @@
 //
 #pragma code_page(65001)
 #include "resource.h"
+#include "branding.h"
 
 #define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////
@@ -89,13 +90,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.follow" "\0"
-            VALUE "FileDescription", "FlClash" "\0"
+            VALUE "CompanyName", BRAND_COMPANY_NAME "\0"
+            VALUE "FileDescription", BRAND_APP_NAME "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "clash" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2023 com.follow. All rights reserved." "\0"
-            VALUE "OriginalFilename", "FlClash.exe" "\0"
-            VALUE "ProductName", "clash" "\0"
+            VALUE "InternalName", BRAND_INTERNAL_NAME "\0"
+            VALUE "LegalCopyright", BRAND_LEGAL_COPYRIGHT "\0"
+            VALUE "OriginalFilename", BRAND_ORIGINAL_FILENAME "\0"
+            VALUE "ProductName", BRAND_PRODUCT_NAME "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

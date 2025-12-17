@@ -26,6 +26,9 @@ val localProperties = Properties().apply {
     }
 }
 
+val brandApplicationId: String? = localProperties.getProperty("brand.applicationId")
+val brandAppName: String? = localProperties.getProperty("brand.appName")
+
 val mStoreFile: File = file("keystore.jks")
 val mStorePassword: String? = localProperties.getProperty("storePassword")
 val mKeyAlias: String? = localProperties.getProperty("keyAlias")
@@ -47,11 +50,13 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.follow.clash"
+        applicationId = brandApplicationId ?: "com.follow.clash"
         minSdk = flutter.minSdkVersion
         targetSdk = libs.versions.targetSdk.get().toInt()
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+
+        resValue("string", "app_name", brandAppName ?: "FlClash")
     }
 
     signingConfigs {

@@ -1,0 +1,24 @@
+{
+  "id": "first",
+  "app_name": "First Clash",
+  "repository": "your-org/your-repo",
+  "url_schemes": ["firstclash"],
+  "android": {
+    "application_id": "com.example.firstclash"
+  },
+  "macos": {
+    "bundle_id": "com.example.firstclash"
+  },
+  "windows": {
+    "binary_name": "FirstClash"
+  },
+  "ports": {
+    "mixed_port": 7891,
+    "external_controller_port": 9091,
+    "dns_listen_port": 1054,
+    "helper_port": 47891
+  },
+  "assets": {
+    "icon": "https://cdn.awsind0-fusion.fds.api.mi-img.com/b2c-mikfs-media-in/png251216-1c383587a815e77fdb1b48fe5d8e9303.png"
+  }
+}

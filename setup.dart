@@ -1225,11 +1225,11 @@ privileges_required: admin
       final updated = content
           .replaceAll(
             RegExp(r'^title:.*$', multiLine: true),
-            'title: $appBundleName',
+            "title: '${_escapeYamlSingleQuoted(appBundleName)}'",
           )
           .replaceAll(
-            RegExp(r'^\\s*path:.*\\.app\\s*$', multiLine: true),
-            '    path: $appBundleName.app',
+            RegExp(r'^\s*path:.*\.app\s*$', multiLine: true),
+            "    path: '${_escapeYamlSingleQuoted(appBundleName)}.app'",
           );
       await File(dmgConfigPath).writeAsString(updated);
     }

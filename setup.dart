@@ -996,6 +996,11 @@ privileges_required: admin
     return sanitized.isEmpty ? 'FlClash' : sanitized;
   }
 
+  String _quotePbxprojString(String value) {
+    final escaped = value.replaceAll('\\', '\\\\').replaceAll('"', '\\"');
+    return '"$escaped"';
+  }
+
   String _replaceBetweenMarkers({
     required String content,
     required String beginMarker,
@@ -1176,6 +1181,7 @@ privileges_required: admin
     );
     if (File(pbxprojPath).existsSync()) {
       final content = await File(pbxprojPath).readAsString();
+      final appBundleFileName = '$appBundleName.app';
       final updated = content
           .replaceAll(
             'PRODUCT_BUNDLE_IDENTIFIER = com.follow.clash.debug;',
@@ -1185,7 +1191,11 @@ privileges_required: admin
             'PRODUCT_BUNDLE_IDENTIFIER = com.follow.clash;',
             'PRODUCT_BUNDLE_IDENTIFIER = $bundleId;',
           )
-          .replaceAll('FlClash.app', '$appBundleName.app');
+          .replaceAll(
+            'path = FlClash.app;',
+            'path = ${_quotePbxprojString(appBundleFileName)};',
+          )
+          .replaceAll('FlClash.app', appBundleFileName);
       await File(pbxprojPath).writeAsString(updated);
     }
 

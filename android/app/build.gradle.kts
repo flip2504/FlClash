@@ -1,3 +1,4 @@
+import groovy.json.JsonSlurper
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.util.Properties
 
@@ -9,16 +10,6 @@ plugins {
     id("com.google.firebase.crashlytics") apply false
 }
 
-val hasGoogleServicesJson =
-    file("google-services.json").let { it.exists() && it.length() > 0 }
-
-if (hasGoogleServicesJson) {
-    apply(plugin = "com.google.gms.google-services")
-    apply(plugin = "com.google.firebase.crashlytics")
-} else {
-    println("google-services.json not found; skipping Firebase plugins")
-}
-
 val localPropertiesFile = rootProject.file("local.properties")
 val localProperties = Properties().apply {
     if (localPropertiesFile.exists()) {
@@ -28,6 +19,35 @@ val localProperties = Properties().apply {
 
 val brandApplicationId: String? = localProperties.getProperty("brand.applicationId")
 val brandAppName: String? = localProperties.getProperty("brand.appName")
+
+fun googleServicesHasClientForPackage(jsonFile: File, applicationId: String): Boolean {
+    return try {
+        val parsed = JsonSlurper().parse(jsonFile) as? Map<*, *> ?: return false
+        val clients = parsed["client"] as? List<*> ?: return false
+        clients.any { client ->
+            val clientMap = client as? Map<*, *> ?: return@any false
+            val clientInfo = clientMap["client_info"] as? Map<*, *> ?: return@any false
+            val androidInfo = clientInfo["android_client_info"] as? Map<*, *> ?: return@any false
+            val pkg = androidInfo["package_name"] as? String
+            pkg == applicationId
+        }
+    } catch (_: Exception) {
+        false
+    }
+}
+
+val resolvedApplicationId = (brandApplicationId ?: "com.follow.clash").trim()
+val googleServicesJsonFile = file("google-services.json")
+val hasGoogleServicesJson =
+    googleServicesJsonFile.let { it.exists() && it.length() > 0 } &&
+        googleServicesHasClientForPackage(googleServicesJsonFile, resolvedApplicationId)
+
+if (hasGoogleServicesJson) {
+    apply(plugin = "com.google.gms.google-services")
+    apply(plugin = "com.google.firebase.crashlytics")
+} else {
+    println("google-services.json missing or does not match applicationId=$resolvedApplicationId; skipping Firebase plugins")
+}
 
 val mStoreFile: File = file("keystore.jks")
 val mStorePassword: String? = localProperties.getProperty("storePassword")
@@ -50,7 +70,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = brandApplicationId ?: "com.follow.clash"
+        applicationId = resolvedApplicationId
         minSdk = flutter.minSdkVersion
         targetSdk = libs.versions.targetSdk.get().toInt()
         versionCode = flutter.versionCode

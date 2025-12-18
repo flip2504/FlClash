@@ -1,6 +1,6 @@
 {
   "id": "first",
-  "app_name": "First Clash",
+  "app_name": "First",
   "repository": "your-org/your-repo",
   "url_schemes": ["firstclash"],
   "android": {
